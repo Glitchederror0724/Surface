@@ -1,6 +1,6 @@
- Copyright (c) 2026 OYB. All rights reserved.
-    ================================================================
-]]
+-- Copyright (c) 2026 OYB. All rights reserved.
+  --  ================================================================
+--]]
 
 -- ⚠️ IMPORTANT: Put this code at the VERY TOP of your Main Script (before obfuscating) ⚠️
 
