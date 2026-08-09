@@ -61,7 +61,7 @@ local useNonce = true -- Hidden from Config to avoid user confusion, but active 
 
 -- Safe request function for universal executor support
 local function safeRequest(options)
-    local req = request or http_request or syn_request or (http and http.request )
+    local req = request or http_request or syn_request or (http and http.request)
     if not req then return nil, "HTTP requests not supported" end
     local success, response = pcall(function() return req(options) end)
     if success and response then return response else return nil, "Connection Error" end
@@ -159,8 +159,31 @@ local function StartMainScript()
     -- Set secret global variable to bypass main script protection
     _G[Config.Secret] = true 
     
-    -- Execute main script (FIXED LINE 163)
-    loadstring(game:HttpGet(Config.MainScriptURL))()
+    -- Expose common HTTP and file functions globally to prevent "attempt to call nil value"
+    -- This ensures the main script can use these functions even if they are not automatically available.
+    _G.request = _G.request or request or http_request or syn_request or (http and http.request)
+    _G.syn_request = _G.syn_request or syn_request
+    _G.http_request = _G.http_request or http_request
+    _G.writefile = _G.writefile or writefile
+    _G.readfile = _G.readfile or readfile
+    _G.isfile = _G.isfile or isfile
+    _G.setclipboard = _G.setclipboard or setclipboard
+    
+    -- Execute main script with error handling
+    local success, err = pcall(function()
+        local scriptFunc = loadstring(game:HttpGet(Config.MainScriptURL))
+        if type(scriptFunc) == "function" then
+            scriptFunc()
+        else
+            error("Loaded script is not a function (loadstring returned " .. tostring(scriptFunc) .. ")")
+        end
+    end)
+    
+    if not success then
+        -- Log the error and re-throw it with context so the user can see the issue
+        warn("Main script execution error: ", err)
+        error("Failed to execute main script: " .. tostring(err))
+    end
 end
 
 local function CreateGUI()
