@@ -160,7 +160,7 @@ local function StartMainScript()
     _G[Config.Secret] = true 
     
     -- Execute main script
-    loadstring(game:HttpGet(MainScriptURL))()
+    loadstring(game:HttpGet(https://raw.githubusercontent.com/Glitchederror0724/Surface/refs/heads/main/surface_explots.lua))()
 end
 
 local function CreateGUI()
