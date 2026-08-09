@@ -1,3 +1,33 @@
+ Copyright (c) 2026 OYB. All rights reserved.
+    ================================================================
+]]
+
+-- ⚠️ IMPORTANT: Put this code at the VERY TOP of your Main Script (before obfuscating) ⚠️
+
+local ProtectionConfig = {
+    -- 🔴 CRITICAL: This MUST exactly match the 'Secret' value in your Key System's Config!
+    -- If your Key System has: Secret = "Test"
+    -- Then this must also be: SecretKey = "Test"
+    SecretKey = "Owner_Of_Surface",
+    
+    -- The name of your Hub (shown in the kick message if they try to bypass)
+    HubName = "Surface"
+}
+
+-- Anti-Bypass Logic: Checks if the Key System successfully set the global variable
+if not _G[ProtectionConfig.SecretKey] then
+    local player = game:GetService("Players").LocalPlayer
+    if player then
+        player:Kick("\n🛡️ Unauthorized Execution 🛡️\n\nPlease use the official Key System to run " .. ProtectionConfig.HubName)
+    end
+    return -- Stops the rest of the script from loading!
+end
+
+-------------------------------------------------------------------------------
+-- 👇 YOUR MAIN SCRIPT CODE STARTS HERE 👇
+-------------------------------------------------------------------------------
+
+print(ProtectionConfig.HubName .. " Loaded Successfully!")
 -- Services  
 local Players = game:GetService("Players")  
 local RunService = game:GetService("RunService")  
@@ -24,12 +54,12 @@ local flying = false
 local espObjects = {}
 
 -- ============================================  
--- FUNCTION DEFINITIONS (ALL BEFORE UI CREATION)  
+-- FUNCTION DEFINITIONS  
 -- ============================================
 
 -- GUI Setup  
 local ScreenGui = Instance.new("ScreenGui")  
-ScreenGui.Name = "Surface"  
+ScreenGui.Name = "DeltaUltimateGUI"  
 ScreenGui.ResetOnSpawn = false  
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
@@ -44,7 +74,7 @@ MainFrame.Parent = ScreenGui
 local Title = Instance.new("TextLabel")  
 Title.Size = UDim2.new(1, 0, 0, 30)  
 Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)  
-Title.Text = "Surface Script"  
+Title.Text = "Delta Ultimate v5.1"  
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)  
 Title.Font = Enum.Font.SourceSansBold  
 Title.TextSize = 20  
@@ -183,7 +213,7 @@ local function createSlider(parent, text, min, max, default, callback)
     end)  
 end
 
--- FIXED SCRIPT LOADER  
+-- FIXED SCRIPT LOADER (No game:HttpGet - uses HttpService instead)  
 local function loadScriptFromUrl(url)  
     if not url or url == "" then  
         warn("Please enter a valid URL")  
@@ -201,9 +231,9 @@ local function loadScriptFromUrl(url)
     loadingLabel.TextSize = 14  
     loadingLabel.Parent = ScreenGui
 
-    -- Try to load and execute  
+    -- Try to load and execute using HttpService  
     local success, result = pcall(function()  
-        local content = game:HttpGet(url)  
+        local content = HttpService:GetAsync(url)  
         if not content or content == "" then  
             error("Failed to fetch URL - empty response")  
         end
@@ -561,16 +591,13 @@ end)
 
 -- Main loop  
 RunService.RenderStepped:Connect(function()  
-    if flying then  
-        -- Fly is handled in enableFly connection  
-    end  
     if settings.espEnabled then  
         updateESP()  
     end  
 end)
 
 -- ============================================  
--- UI ELEMENTS CREATION (ALL AFTER FUNCTIONS)  
+-- UI ELEMENTS CREATION  
 -- ============================================
 
 -- MAIN TAB  
@@ -693,7 +720,7 @@ local displayName = LocalPlayer.DisplayName
 local accountAge = LocalPlayer.AccountAge  
 local dateCreated = os.date("%Y-%m-%d", os.time() - (accountAge * 86400))
 
-createInfoLabel(frames["Info"], "Script: Suface Script")  
+createInfoLabel(frames["Info"], "Script: Delta Ultimate v5.1")  
 createInfoLabel(frames["Info"], "Version: 5.1")  
 createInfoLabel(frames["Info"], "Username: " .. userName)  
 createInfoLabel(frames["Info"], "Display Name: " .. displayName)  
@@ -708,5 +735,5 @@ createInfoLabel(frames["Info"], "Creator: Glitchederror0724")
 createInfoLabel(frames["Info"], "Created: 2024")  
 createInfoLabel(frames["Info"], "Status: Loaded Successfully")
 
-print("Surface Script loaded successfully!")  
+print("Delta Ultimate v5.1 loaded successfully!")  
 print("Welcome, " .. userName .. "!")
