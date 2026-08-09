@@ -1,9 +1,3 @@
--- Copyright (c) 2026 OYB. All rights reserved.
-  --  ================================================================
---]]
-
--- ⚠️ IMPORTANT: Put this code at the VERY TOP of your Main Script (before obfuscating) ⚠️
-
 local ProtectionConfig = {
     -- 🔴 CRITICAL: This MUST exactly match the 'Secret' value in your Key System's Config!
     -- If your Key System has: Secret = "Test"
