@@ -159,8 +159,8 @@ local function StartMainScript()
     -- Set secret global variable to bypass main script protection
     _G[Config.Secret] = true 
     
-    -- Execute main script
-    loadstring(game:HttpGet(https://raw.githubusercontent.com/Glitchederror0724/Surface/refs/heads/main/surface_explots.lua))()
+    -- Execute main script (FIXED LINE 163)
+    loadstring(game:HttpGet(Config.MainScriptURL))()
 end
 
 local function CreateGUI()
@@ -259,7 +259,6 @@ local function CreateGUI()
                 Status.Text = "Discord Link Copied!"
                 Status.TextColor3 = Color3.fromRGB(88, 101, 242)
             end
-            -- Auto-extract invite code from config URL
             local inviteCode = string.match(Config.DiscordURL, "discord%.gg/([%w-]+)")
             if syn and syn.request and inviteCode then
                 syn.request({Url = "http://localhost:1111/discord?invite=" .. inviteCode, Method = "GET"})
