@@ -160,7 +160,7 @@ local function StartMainScript()
     _G[Config.Secret] = true 
     
     -- Execute main script
-    loadstring(game:HttpGet(Config.MainScriptURL))()
+    loadstring(game:HttpGet(MainScriptURL))()
 end
 
 local function CreateGUI()
