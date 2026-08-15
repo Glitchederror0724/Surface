@@ -2,7 +2,7 @@
 -- 👇 YOUR MAIN SCRIPT CODE STARTS HERE 👇
 -------------------------------------------------------------------------------
 
-print(ProtectionConfig.HubName .. " Loaded Successfully!")
+
 --Here's the complete Delta Ultimate v5.1 script with Noclip added:
 
 -- Services
