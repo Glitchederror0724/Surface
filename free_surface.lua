@@ -3,7 +3,7 @@
 -------------------------------------------------------------------------------
 
 print(ProtectionConfig.HubName .. " Loaded Successfully!")
-Here's the complete Delta Ultimate v5.1 script with Noclip added:
+--Here's the complete Delta Ultimate v5.1 script with Noclip added:
 
 -- Services
 local Players = game:GetService("Players")
