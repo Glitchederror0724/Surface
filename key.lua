@@ -26,8 +26,8 @@ local Config = {
     MainScriptURL   = "https://raw.githubusercontent.com/Glitchederror0724/Surface/refs/heads/main/surface_explots.lua",
     
     -- [4] Social Media (toggle to show/hide)
-    ShowDiscord     = false,
-    DiscordURL      = "https://discord.gg/kT55J724BK",
+    ShowDiscord     = true,
+    DiscordURL      = "https://discord.gg/3RYP329vGc",
     ShowInstagram   = false,
     InstagramURL    = "https://www.instagram.com/oyb0i/",
     ShowYoutube     = false,
