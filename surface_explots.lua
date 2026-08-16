@@ -637,135 +637,31 @@ local gameHubScripts = {
         ]]
     },
     
-    ["Blox Fruits"] = {
-        id = 2753915549,
+    ["Animals Hospital"] = {
+        id = 78515283254292,
         script = [[
-            -- Blox Fruits Script (Basic)
-            local Players = game:GetService("Players")
-            local LocalPlayer = Players.LocalPlayer
-
-            -- Speed
-            LocalPlayer.Character.Humanoid.WalkSpeed = 100
-
-            -- Infinite Jump
-            game:GetService("UserInputService").JumpRequest:Connect(function()
-                LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-            end)
-
-            print("Blox Fruits Script Loaded!")
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Glitchederror0724/Surface/refs/heads/main/games/animal_hospital"))()
         ]]
     },
     
-    ["Tower of Hell"] = {
-        id = 4623386862,
+    ["Demonogly"] = {
+        id = 18199615050,
         script = [[
-            -- Tower of Hell Script
-            local Players = game:GetService("Players")
-            local LocalPlayer = Players.LocalPlayer
-
-            -- Speed
-            LocalPlayer.Character.Humanoid.WalkSpeed = 200
-
-            -- Noclip
-            game:GetService("RunService").Stepped:Connect(function()
-                for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
-                    if part:IsA("BasePart") then
-                        part.CanCollide = false
-                    end
-                end
-            end)
-
-            print("Tower of Hell Script Loaded!")
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Glitchederror0724/Surface/refs/heads/main/games/demonology"))()
         ]]
     },
     
-    ["Arsenal"] = {
-        id = 286090429,
+    ["Jailbreak"] = {
+        id = 606849621,
         script = [[
-            -- Arsenal Script (Aimbot Basic)
-            local Players = game:GetService("Players")
-            local RunService = game:GetService("RunService")
-            local LocalPlayer = Players.LocalPlayer
-            local Camera = workspace.CurrentCamera
-
-            RunService.RenderStepped:Connect(function()
-                local closest = nil
-                local closestDist = math.huge
-                
-                for _, player in ipairs(Players:GetPlayers()) do
-                    if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
-                        local screenPos, onScreen = Camera:WorldToScreenPoint(player.Character.Head.Position)
-                        if onScreen then
-                            local dist = (Vector2.new(screenPos.X, screenPos.Y) - Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)).Magnitude
-                            if dist < closestDist then
-                                closestDist = dist
-                                closest = player
-                            end
-                        end
-                    end
-                end
-                
-                if closest then
-                    -- Simple aim assist
-                end
-            end)
-
-            print("Arsenal Script Loaded!")
-        ]]
-    },
-    
-    ["Brookhaven"] = {
-        id = 4924922222,
-        script = [[
-            -- Brookhaven Script
-            local Players = game:GetService("Players")
-            local LocalPlayer = Players.LocalPlayer
-
-            -- Speed
-            LocalPlayer.Character.Humanoid.WalkSpeed = 100
-
-            -- Fly
-            local flying = false
-            local UserInputService = game:GetService("UserInputService")
-
-            UserInputService.InputBegan:Connect(function(input)
-                if input.KeyCode == Enum.KeyCode.F then
-                    flying = not flying
-                    if flying then
-                        local bv = Instance.new("BodyVelocity")
-                        bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-                        bv.Parent = LocalPlayer.Character.HumanoidRootPart
-                    else
-                        local bv = LocalPlayer.Character.HumanoidRootPart:FindFirstChildOfClass("BodyVelocity")
-                        if bv then bv:Destroy() end
-                    end
-                end
-            end)
-
-            print("Brookhaven Script Loaded!")
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Glitchederror0724/Surface/refs/heads/main/games/jailbreak"))()
         ]]
     },
     
     ["Piggy"] = {
         id = 4623386862,
         script = [[
-            -- Piggy Script
-            local Players = game:GetService("Players")
-            local LocalPlayer = Players.LocalPlayer
-
-            -- Speed
-            LocalPlayer.Character.Humanoid.WalkSpeed = 150
-
-            -- Noclip
-            game:GetService("RunService").Stepped:Connect(function()
-                for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
-                    if part:IsA("BasePart") then
-                        part.CanCollide = false
-                    end
-                end
-            end)
-
-            print("Piggy Script Loaded!")
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/Glitchederror0724/Surface/refs/heads/main/games/Piggy"))()
         ]]
     },
     
