@@ -1,7 +1,6 @@
 -- Services  
 local Players = game:GetService("Players")  
 local RunService = game:GetService("RunService")  
-local Lighting = game:GetService("Lighting")  
 local HttpService = game:GetService("HttpService")  
 local VirtualUser = game:GetService("VirtualUser")  
 local Camera = workspace.CurrentCamera or workspace:WaitForChild("Camera")  
