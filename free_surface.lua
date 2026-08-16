@@ -682,25 +682,7 @@ for gameName, gameData in pairs(gameHubScripts) do
                 notification:Destroy()
             end)
         else
-            -- Teleport to game
-            local notification = Instance.new("TextLabel")
-            notification.Size = UDim2.new(0, 200, 0, 30)
-            notification.Position = UDim2.new(0.5, -100, 0.8, 0)
-            notification.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
-            notification.Text = "Teleporting to " .. gameName .. "..."
-            notification.TextColor3 = Color3.fromRGB(255, 255, 255)
-            notification.Font = Enum.Font.SourceSansBold
-            notification.TextSize = 14
-            notification.Parent = ScreenGui
-            
-            task.delay(2, function()
-                notification:Destroy()
-            end)
-            
-            game:GetService("TeleportService"):Teleport(gameData.id)
-        end
-    end)
-    
+          
     yPos = yPos + 40
 end
 
