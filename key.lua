@@ -20,7 +20,7 @@ local Config = {
     PlatoSecret     = "1021ca24-5d32-4433-9143-d566dabd5d84",
 
     -- [2] Anti-Bypass
-    Secret          = "Owner_Of_Surface",
+    Secret          = "Test",
     
     -- [3] Scripts & Links
     MainScriptURL   = "https://raw.githubusercontent.com/Glitchederror0724/Surface/refs/heads/main/surface_explots.lua",
