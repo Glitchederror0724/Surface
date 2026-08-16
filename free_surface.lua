@@ -621,7 +621,6 @@ local gameHubScripts = {
     },
     
     ["Demonogly"] = {
-        id = 18199615050,
         script = [[
             loadstring(game:HttpGet("https://raw.githubusercontent.com/Glitchederror0724/Surface/refs/heads/main/games/demonology"))()
         ]]
