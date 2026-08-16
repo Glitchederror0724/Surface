@@ -1,389 +1,387 @@
--------------------------------------------------------------------------------
--- 👇 YOUR MAIN SCRIPT CODE STARTS HERE 👇
--------------------------------------------------------------------------------
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-local Lighting = game:GetService("Lighting")
-local HttpService = game:GetService("HttpService")
-local VirtualUser = game:GetService("VirtualUser")
-local Camera = workspace.CurrentCamera or workspace:WaitForChild("Camera")
+-- Services  
+local Players = game:GetService("Players")  
+local RunService = game:GetService("RunService")  
+local UserInputService = game:GetService("UserInputService")  
+local Lighting = game:GetService("Lighting")  
+local HttpService = game:GetService("HttpService")  
+local VirtualUser = game:GetService("VirtualUser")  
+local Camera = workspace.CurrentCamera or workspace:WaitForChild("Camera")  
 local LocalPlayer = Players.LocalPlayer
 
--- Settings
-local settings = {
-    flySpeed = 50,
-    espEnabled = true,
-    espColor = Color3.fromRGB(255, 0, 0),
-    walkSpeed = 16,
-    jumpPower = 50,
-    fullbrightEnabled = false,
-    antiAFKEnabled = true,
-    noclipEnabled = false
+-- Settings  
+local settings = {  
+    flySpeed = 50,  
+    espEnabled = true,  
+    espColor = Color3.fromRGB(255, 0, 0),  
+    walkSpeed = 16,  
+    jumpPower = 50,  
+    fullbrightEnabled = false,  
+    antiAFKEnabled = true,  
+    noclipEnabled = false  
 }
 
--- State
-local flying = false
+-- State  
+local flying = false  
 local espObjects = {}
 
--- ============================================
--- FUNCTION DEFINITIONS
+-- ============================================  
+-- FUNCTION DEFINITIONS  
 -- ============================================
 
--- GUI Setup
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "DeltaUltimateGUI"
-ScreenGui.ResetOnSpawn = false
+-- GUI Setup  
+local ScreenGui = Instance.new("ScreenGui")  
+ScreenGui.Name = "DeltaUltimateGUI"  
+ScreenGui.ResetOnSpawn = false  
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
-local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 350, 0, 500)
-MainFrame.Position = UDim2.new(0, 10, 0, 10)
-MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-MainFrame.Active = true
-MainFrame.Draggable = true
+local MainFrame = Instance.new("Frame")  
+MainFrame.Size = UDim2.new(0, 350, 0, 550)  
+MainFrame.Position = UDim2.new(0, 10, 0, 10)  
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)  
+MainFrame.Active = true  
+MainFrame.Draggable = true  
 MainFrame.Parent = ScreenGui
 
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, 0, 0, 30)
-Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-Title.Text = "Delta Ultimate v5.1"
-Title.TextColor3 = Color3.fromRGB(255, 255, 255)
-Title.Font = Enum.Font.SourceSansBold
-Title.TextSize = 20
+local Title = Instance.new("TextLabel")  
+Title.Size = UDim2.new(1, 0, 0, 30)  
+Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)  
+Title.Text = "Delta Ultimate v5.1"  
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)  
+Title.Font = Enum.Font.SourceSansBold  
+Title.TextSize = 20  
 Title.Parent = MainFrame
 
--- Create tabs
-local TabBar = Instance.new("Frame")
-TabBar.Size = UDim2.new(1, 0, 0, 35)
-TabBar.Position = UDim2.new(0, 0, 0, 30)
-TabBar.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+-- Create tabs  
+local TabBar = Instance.new("Frame")  
+TabBar.Size = UDim2.new(1, 0, 0, 35)  
+TabBar.Position = UDim2.new(0, 0, 0, 30)  
+TabBar.BackgroundColor3 = Color3.fromRGB(35, 35, 35)  
 TabBar.Parent = MainFrame
 
-local tabButtons = {}
-local tabNames = {"Main", "Movement", "Visual", "Utility", "Teleport", "Info"}
+local tabButtons = {}  
+local tabNames = {"Main", "Movement", "Visual", "Utility", "Teleport", "GameHub", "Info"}  
 local frames = {}
 
--- Create frames first
-for _, name in ipairs(tabNames) do
-    local frame = Instance.new("ScrollingFrame")
-    frame.Size = UDim2.new(1, 0, 1, -65)
-    frame.Position = UDim2.new(0, 0, 0, 65)
-    frame.BackgroundTransparency = 1
-    frame.ScrollBarThickness = 5
-    frame.CanvasSize = UDim2.new(0, 0, 0, 0)
-    frame.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    frame.Visible = (name == "Main")
-    frame.Parent = MainFrame
-    frames[name] = frame
+-- Create frames first  
+for _, name in ipairs(tabNames) do  
+    local frame = Instance.new("ScrollingFrame")  
+    frame.Size = UDim2.new(1, 0, 1, -65)  
+    frame.Position = UDim2.new(0, 0, 0, 65)  
+    frame.BackgroundTransparency = 1  
+    frame.ScrollBarThickness = 5  
+    frame.CanvasSize = UDim2.new(0, 0, 0, 0)  
+    frame.AutomaticCanvasSize = Enum.AutomaticSize.Y  
+    frame.Visible = (name == "Main")  
+    frame.Parent = MainFrame  
+    frames[name] = frame  
 end
 
--- Create tab buttons
-for i, name in ipairs(tabNames) do
-    local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.1667, 0, 1, 0)
-    btn.Position = UDim2.new((i - 1) * 0.1667, 0, 0, 0)
-    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    btn.Text = name
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.Font = Enum.Font.SourceSans
-    btn.TextSize = 12
-    btn.Parent = TabBar
-    tabButtons[name] = btn
+-- Create tab buttons  
+for i, name in ipairs(tabNames) do  
+    local btn = Instance.new("TextButton")  
+    btn.Size = UDim2.new(0.1428, 0, 1, 0)  
+    btn.Position = UDim2.new((i - 1) * 0.1428, 0, 0, 0)  
+    btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)  
+    btn.Text = name  
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)  
+    btn.Font = Enum.Font.SourceSans  
+    btn.TextSize = 10  
+    btn.Parent = TabBar  
+    tabButtons[name] = btn  
 end
 
--- Tab switching
-local function switchTab(tabName)
-    for name, frame in pairs(frames) do
-        frame.Visible = (name == tabName)
-    end
-    for name, btn in pairs(tabButtons) do
-        btn.BackgroundColor3 = (name == tabName) and Color3.fromRGB(70, 70, 70) or Color3.fromRGB(50, 50, 50)
-    end
+-- Tab switching  
+local function switchTab(tabName)  
+    for name, frame in pairs(frames) do  
+        frame.Visible = (name == tabName)  
+    end  
+    for name, btn in pairs(tabButtons) do  
+        btn.BackgroundColor3 = (name == tabName) and Color3.fromRGB(70, 70, 70) or Color3.fromRGB(50, 50, 50)  
+    end  
 end
 
-for name, btn in pairs(tabButtons) do
-    btn.MouseButton1Click:Connect(function()
-        switchTab(name)
-    end)
+for name, btn in pairs(tabButtons) do  
+    btn.MouseButton1Click:Connect(function()  
+        switchTab(name)  
+    end)  
 end
 
--- Helper functions
-local function createButton(parent, text, callback)
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0.9, 0, 0, 30)
-    button.Position = UDim2.new(0.05, 0, 0, #parent:GetChildren() * 35)
-    button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    button.Text = text
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.Font = Enum.Font.SourceSans
-    button.TextSize = 14
-    button.Parent = parent
-    button.MouseButton1Click:Connect(callback)
-    return button
+-- Helper functions  
+local function createButton(parent, text, callback)  
+    local button = Instance.new("TextButton")  
+    button.Size = UDim2.new(0.9, 0, 0, 30)  
+    button.Position = UDim2.new(0.05, 0, 0, #parent:GetChildren() * 35)  
+    button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)  
+    button.Text = text  
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)  
+    button.Font = Enum.Font.SourceSans  
+    button.TextSize = 14  
+    button.Parent = parent  
+    button.MouseButton1Click:Connect(callback)  
+    return button  
 end
 
-local function createToggle(parent, text, initial, callback)
-    local value = initial
-    local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0.9, 0, 0, 30)
-    button.Position = UDim2.new(0.05, 0, 0, #parent:GetChildren() * 35)
-    button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    button.Text = text .. ": " .. (value and "ON" or "OFF")
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.Font = Enum.Font.SourceSans
-    button.TextSize = 14
-    button.Parent = parent
-    button.MouseButton1Click:Connect(function()
-        value = not value
-        button.Text = text .. ": " .. (value and "ON" or "OFF")
-        callback(value)
-    end)
-    return button
+local function createToggle(parent, text, initial, callback)  
+    local value = initial  
+    local button = Instance.new("TextButton")  
+    button.Size = UDim2.new(0.9, 0, 0, 30)  
+    button.Position = UDim2.new(0.05, 0, 0, #parent:GetChildren() * 35)  
+    button.BackgroundColor3 = Color3.fromRGB(60, 60, 60)  
+    button.Text = text .. ": " .. (value and "ON" or "OFF")  
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)  
+    button.Font = Enum.Font.SourceSans  
+    button.TextSize = 14  
+    button.Parent = parent  
+    button.MouseButton1Click:Connect(function()  
+        value = not value  
+        button.Text = text .. ": " .. (value and "ON" or "OFF")  
+        callback(value)  
+    end)  
+    return button  
 end
 
-local function createSlider(parent, text, min, max, default, callback)
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0.9, 0, 0, 50)
-    frame.Position = UDim2.new(0.05, 0, 0, #parent:GetChildren() * 55)
-    frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+local function createSlider(parent, text, min, max, default, callback)  
+    local frame = Instance.new("Frame")  
+    frame.Size = UDim2.new(0.9, 0, 0, 50)  
+    frame.Position = UDim2.new(0.05, 0, 0, #parent:GetChildren() * 55)  
+    frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)  
     frame.Parent = parent
 
-    local label = Instance.new("TextLabel")
-    label.Size = UDim2.new(1, 0, 0, 20)
-    label.BackgroundTransparency = 1
-    label.Text = text .. ": " .. default
-    label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    label.Font = Enum.Font.SourceSans
-    label.TextSize = 14
+    local label = Instance.new("TextLabel")  
+    label.Size = UDim2.new(1, 0, 0, 20)  
+    label.BackgroundTransparency = 1  
+    label.Text = text .. ": " .. default  
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)  
+    label.Font = Enum.Font.SourceSans  
+    label.TextSize = 14  
     label.Parent = frame
 
-    local value = default
-    local sliderBtn = Instance.new("TextButton")
-    sliderBtn.Size = UDim2.new(1, -20, 0, 20)
-    sliderBtn.Position = UDim2.new(0, 10, 0, 25)
-    sliderBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
-    sliderBtn.Text = "← " .. value .. " →"
-    sliderBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    sliderBtn.Font = Enum.Font.SourceSans
-    sliderBtn.TextSize = 12
+    local value = default  
+    local sliderBtn = Instance.new("TextButton")  
+    sliderBtn.Size = UDim2.new(1, -20, 0, 20)  
+    sliderBtn.Position = UDim2.new(0, 10, 0, 25)  
+    sliderBtn.BackgroundColor3 = Color3.fromRGB(80, 80, 80)  
+    sliderBtn.Text = "← " .. value .. " →"  
+    sliderBtn.TextColor3 = Color3.fromRGB(255, 255, 255)  
+    sliderBtn.Font = Enum.Font.SourceSans  
+    sliderBtn.TextSize = 12  
     sliderBtn.Parent = frame
 
-    sliderBtn.MouseButton1Click:Connect(function()
-        value = value + 1
-        if value > max then value = min end
-        sliderBtn.Text = "← " .. value .. " →"
-        label.Text = text .. ": " .. value
-        callback(value)
+    sliderBtn.MouseButton1Click:Connect(function()  
+        value = value + 1  
+        if value > max then value = min end  
+        sliderBtn.Text = "← " .. value .. " →"  
+        label.Text = text .. ": " .. value  
+        callback(value)  
     end)
 
-    sliderBtn.MouseButton2Click:Connect(function()
-        value = value - 1
-        if value < min then value = max end
-        sliderBtn.Text = "← " .. value .. " →"
-        label.Text = text .. ": " .. value
-        callback(value)
-    end)
+    sliderBtn.MouseButton2Click:Connect(function()  
+        value = value - 1  
+        if value < min then value = max end  
+        sliderBtn.Text = "← " .. value .. " →"  
+        label.Text = text .. ": " .. value  
+        callback(value)  
+    end)  
 end
 
--- FIXED SCRIPT LOADER (No game:HttpGet - uses HttpService instead)
-local function loadScriptFromUrl(url)
-    if not url or url == "" then
-        warn("Please enter a valid URL")
-        return
+-- SCRIPT LOADER  
+local function loadScriptFromUrl(url)  
+    if not url or url == "" then  
+        warn("Please enter a valid URL")  
+        return  
     end
 
-    local loadingLabel = Instance.new("TextLabel")
-    loadingLabel.Size = UDim2.new(0, 200, 0, 30)
-    loadingLabel.Position = UDim2.new(0.5, -100, 0.7, 0)
-    loadingLabel.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
-    loadingLabel.Text = "Loading script..."
-    loadingLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    loadingLabel.Font = Enum.Font.SourceSansBold
-    loadingLabel.TextSize = 14
+    local loadingLabel = Instance.new("TextLabel")  
+    loadingLabel.Size = UDim2.new(0, 200, 0, 30)  
+    loadingLabel.Position = UDim2.new(0.5, -100, 0.7, 0)  
+    loadingLabel.BackgroundColor3 = Color3.fromRGB(255, 165, 0)  
+    loadingLabel.Text = "Loading script..."  
+    loadingLabel.TextColor3 = Color3.fromRGB(255, 255, 255)  
+    loadingLabel.Font = Enum.Font.SourceSansBold  
+    loadingLabel.TextSize = 14  
     loadingLabel.Parent = ScreenGui
 
-    local success, result = pcall(function()
-        local content = HttpService:GetAsync(url)
-        if not content or content == "" then
-            error("Failed to fetch URL - empty response")
+    local success, result = pcall(function()  
+        local content = HttpService:GetAsync(url)  
+        if not content or content == "" then  
+            error("Failed to fetch URL - empty response")  
         end
 
-        local func = loadstring(content)
-        if not func then
-            error("Failed to compile script - invalid Lua code")
+        local func = loadstring(content)  
+        if not func then  
+            error("Failed to compile script - invalid Lua code")  
         end
 
-        func()
+        func()  
     end)
 
-    task.delay(2, function()
-        loadingLabel:Destroy()
+    task.delay(2, function()  
+        loadingLabel:Destroy()  
     end)
 
-    if success then
-        local successLabel = Instance.new("TextLabel")
-        successLabel.Size = UDim2.new(0, 200, 0, 30)
-        successLabel.Position = UDim2.new(0.5, -100, 0.7, 0)
-        successLabel.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
-        successLabel.Text = "Script loaded successfully!"
-        successLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        successLabel.Font = Enum.Font.SourceSansBold
-        successLabel.TextSize = 14
+    if success then  
+        local successLabel = Instance.new("TextLabel")  
+        successLabel.Size = UDim2.new(0, 200, 0, 30)  
+        successLabel.Position = UDim2.new(0.5, -100, 0.7, 0)  
+        successLabel.BackgroundColor3 = Color3.fromRGB(0, 150, 0)  
+        successLabel.Text = "Script loaded successfully!"  
+        successLabel.TextColor3 = Color3.fromRGB(255, 255, 255)  
+        successLabel.Font = Enum.Font.SourceSansBold  
+        successLabel.TextSize = 14  
         successLabel.Parent = ScreenGui
 
-        task.delay(2, function()
-            successLabel:Destroy()
-        end)
-    else
+        task.delay(2, function()  
+            successLabel:Destroy()  
+        end)  
+    else  
         warn("Script load error: " .. tostring(result))
 
-        local errorLabel = Instance.new("TextLabel")
-        errorLabel.Size = UDim2.new(0, 200, 0, 30)
-        errorLabel.Position = UDim2.new(0.5, -100, 0.7, 0)
-        errorLabel.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-        errorLabel.Text = "Error: " .. tostring(result)
-        errorLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-        errorLabel.Font = Enum.Font.SourceSansBold
-        errorLabel.TextSize = 12
+        local errorLabel = Instance.new("TextLabel")  
+        errorLabel.Size = UDim2.new(0, 200, 0, 30)  
+        errorLabel.Position = UDim2.new(0.5, -100, 0.7, 0)  
+        errorLabel.BackgroundColor3 = Color3.fromRGB(200, 0, 0)  
+        errorLabel.Text = "Error: " .. tostring(result)  
+        errorLabel.TextColor3 = Color3.fromRGB(255, 255, 255)  
+        errorLabel.Font = Enum.Font.SourceSansBold  
+        errorLabel.TextSize = 12  
         errorLabel.Parent = ScreenGui
 
-        task.delay(3, function()
-            errorLabel:Destroy()
-        end)
-    end
+        task.delay(3, function()  
+            errorLabel:Destroy()  
+        end)  
+    end  
 end
 
-local function createTextBox(parent, placeholder, executeText)
-    local frame = Instance.new("Frame")
-    frame.Size = UDim2.new(0.9, 0, 0, 60)
-    frame.Position = UDim2.new(0.05, 0, 0, #parent:GetChildren() * 65)
-    frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+local function createTextBox(parent, placeholder, executeText)  
+    local frame = Instance.new("Frame")  
+    frame.Size = UDim2.new(0.9, 0, 0, 60)  
+    frame.Position = UDim2.new(0.05, 0, 0, #parent:GetChildren() * 65)  
+    frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)  
     frame.Parent = parent
 
-    local textBox = Instance.new("TextBox")
-    textBox.Size = UDim2.new(0.95, 0, 0, 25)
-    textBox.Position = UDim2.new(0.025, 0, 0.05, 0)
-    textBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    textBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    textBox.Font = Enum.Font.SourceSans
-    textBox.TextSize = 14
-    textBox.PlaceholderText = placeholder
-    textBox.Text = ""
-    textBox.ClearTextOnFocus = true
+    local textBox = Instance.new("TextBox")  
+    textBox.Size = UDim2.new(0.95, 0, 0, 25)  
+    textBox.Position = UDim2.new(0.025, 0, 0.05, 0)  
+    textBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)  
+    textBox.TextColor3 = Color3.fromRGB(255, 255, 255)  
+    textBox.Font = Enum.Font.SourceSans  
+    textBox.TextSize = 14  
+    textBox.PlaceholderText = placeholder  
+    textBox.Text = ""  
+    textBox.ClearTextOnFocus = true  
     textBox.Parent = frame
 
-    local executeBtn = Instance.new("TextButton")
-    executeBtn.Size = UDim2.new(0.95, 0, 0, 25)
-    executeBtn.Position = UDim2.new(0.025, 0, 0.55, 0)
-    executeBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
-    executeBtn.Text = executeText
-    executeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    executeBtn.Font = Enum.Font.SourceSansBold
-    executeBtn.TextSize = 14
+    local executeBtn = Instance.new("TextButton")  
+    executeBtn.Size = UDim2.new(0.95, 0, 0, 25)  
+    executeBtn.Position = UDim2.new(0.025, 0, 0.55, 0)  
+    executeBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)  
+    executeBtn.Text = executeText  
+    executeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)  
+    executeBtn.Font = Enum.Font.SourceSansBold  
+    executeBtn.TextSize = 14  
     executeBtn.Parent = frame
 
-    executeBtn.MouseButton1Click:Connect(function()
-        local url = textBox.Text or ""
-        url = url:gsub("%s+", "")
-        if url ~= "" then
-            loadScriptFromUrl(url)
-        else
-            warn("Please enter a script URL")
-        end
+    executeBtn.MouseButton1Click:Connect(function()  
+        local url = textBox.Text or ""  
+        url = url:gsub("%s+", "")  
+        if url ~= "" then  
+            loadScriptFromUrl(url)  
+        else  
+            warn("Please enter a script URL")  
+        end  
     end)
 
-    textBox.FocusLost:Connect(function(enterPressed)
-        if enterPressed then
-            local url = textBox.Text or ""
-            url = url:gsub("%s+", "")
-            if url ~= "" then
-                loadScriptFromUrl(url)
-            end
-        end
+    textBox.FocusLost:Connect(function(enterPressed)  
+        if enterPressed then  
+            local url = textBox.Text or ""  
+            url = url:gsub("%s+", "")  
+            if url ~= "" then  
+                loadScriptFromUrl(url)  
+            end  
+        end  
     end)
 
-    return {textBox = textBox, executeBtn = executeBtn}
+    return {textBox = textBox, executeBtn = executeBtn}  
 end
 
--- FLY SYSTEM
-local function startFly()
-    local character = LocalPlayer.Character
+-- FLY SYSTEM  
+local function startFly()  
+    local character = LocalPlayer.Character  
     if not character then return end
 
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    local rootPart = character:FindFirstChild("HumanoidRootPart")
+    local humanoid = character:FindFirstChildOfClass("Humanoid")  
+    local rootPart = character:FindFirstChild("HumanoidRootPart")  
     if not humanoid or not rootPart then return end
 
     humanoid:ChangeState(Enum.HumanoidStateType.Flying)
 
-    local bv = Instance.new("BodyVelocity")
-    bv.Name = "DeltaFlyBV"
-    bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-    bv.P = 10000
-    bv.Velocity = Vector3.new()
+    local bv = Instance.new("BodyVelocity")  
+    bv.Name = "DeltaFlyBV"  
+    bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)  
+    bv.P = 10000  
+    bv.Velocity = Vector3.new()  
     bv.Parent = rootPart
 
-    local bg = Instance.new("BodyGyro")
-    bg.Name = "DeltaFlyBG"
-    bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)
-    bg.P = 10000
-    bg.D = 100
-    bg.CFrame = rootPart.CFrame
-    bg.Parent = rootPart
+    local bg = Instance.new("BodyGyro")  
+    bg.Name = "DeltaFlyBG"  
+    bg.MaxTorque = Vector3.new(math.huge, math.huge, math.huge)  
+    bg.P = 10000  
+    bg.D = 100  
+    bg.CFrame = rootPart.CFrame  
+    bg.Parent = rootPart  
 end
 
-local function stopFly()
-    local character = LocalPlayer.Character
-    if character then
-        local humanoid = character:FindFirstChildOfClass("Humanoid")
+local function stopFly()  
+    local character = LocalPlayer.Character  
+    if character then  
+        local humanoid = character:FindFirstChildOfClass("Humanoid")  
         local rootPart = character:FindFirstChild("HumanoidRootPart")
 
-        if humanoid then
-            humanoid:ChangeState(Enum.HumanoidStateType.Running)
+        if humanoid then  
+            humanoid:ChangeState(Enum.HumanoidStateType.Running)  
         end
 
-        if rootPart then
-            local bv = rootPart:FindFirstChild("DeltaFlyBV")
-            local bg = rootPart:FindFirstChild("DeltaFlyBG")
-            if bv then bv:Destroy() end
-            if bg then bg:Destroy() end
-        end
-    end
+        if rootPart then  
+            local bv = rootPart:FindFirstChild("DeltaFlyBV")  
+            local bg = rootPart:FindFirstChild("DeltaFlyBG")  
+            if bv then bv:Destroy() end  
+            if bg then bg:Destroy() end  
+        end  
+    end  
 end
 
-local flyConnection = nil
-local function enableFly()
+local flyConnection = nil  
+local function enableFly()  
     startFly()
 
     if flyConnection then flyConnection:Disconnect() end
 
-    flyConnection = RunService.RenderStepped:Connect(function()
+    flyConnection = RunService.RenderStepped:Connect(function()  
         if not flying then return end
 
-        local character = LocalPlayer.Character
+        local character = LocalPlayer.Character  
         if not character then return end
 
-        local rootPart = character:FindFirstChild("HumanoidRootPart")
+        local rootPart = character:FindFirstChild("HumanoidRootPart")  
         if not rootPart then return end
 
-        local bv = rootPart:FindFirstChild("DeltaFlyBV")
+        local bv = rootPart:FindFirstChild("DeltaFlyBV")  
         local bg = rootPart:FindFirstChild("DeltaFlyBG")
 
-        if not bv or not bg then
-            startFly()
-            return
+        if not bv or not bg then  
+            startFly()  
+            return  
         end
 
-        local cf = Camera.CFrame
+        local cf = Camera.CFrame  
         local moveDirection = Vector3.new()
 
-        if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDirection = moveDirection + cf.LookVector end
-        if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDirection = moveDirection - cf.LookVector end
-        if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDirection = moveDirection - cf.RightVector end
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveDirection = moveDirection + cf.LookVector end  
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveDirection = moveDirection - cf.LookVector end  
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveDirection = moveDirection - cf.RightVector end  
         if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveDirection = moveDirection + cf.RightVector end
 
-        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveDirection = moveDirection + Vector3.new(0, 1, 0) end
+        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveDirection = moveDirection + Vector3.new(0, 1, 0) end  
         if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then moveDirection = moveDirection - Vector3.new(0, 1, 0) end
 
         if moveDirection.Magnitude > 0 then  
@@ -430,7 +428,6 @@ local function disableNoclip()
         noclipConnection = nil  
     end
     
-    -- Restore collision on all parts  
     local character = LocalPlayer.Character  
     if character then  
         for _, part in ipairs(character:GetDescendants()) do  
@@ -605,6 +602,360 @@ RunService.RenderStepped:Connect(function()
 end)
 
 -- ============================================  
+-- GAME HUB SYSTEM  
+-- ============================================
+
+local gameHubScripts = {
+    ["Dandy's World"] = {
+        id = 18378383072,
+        script = [[
+            -- Dandy's World Script
+            local Players = game:GetService("Players")
+            local RunService = game:GetService("RunService")
+            local LocalPlayer = Players.LocalPlayer
+
+            -- Settings
+            getgenv().DWSettings = {
+                Speed = 50,
+                Noclip = false,
+                InfiniteJump = false
+            }
+
+            -- Speed Hack
+            local function setSpeed(speed)
+                local character = LocalPlayer.Character
+                if character then
+                    local humanoid = character:FindFirstChildOfClass("Humanoid")
+                    if humanoid then
+                        humanoid.WalkSpeed = speed
+                    end
+                end
+            end
+
+            -- Noclip
+            RunService.Stepped:Connect(function()
+                if getgenv().DWSettings.Noclip then
+                    local character = LocalPlayer.Character
+                    if character then
+                        for _, part in ipairs(character:GetDescendants()) do
+                            if part:IsA("BasePart") then
+                                part.CanCollide = false
+                            end
+                        end
+                    end
+                end
+            end)
+
+            -- Infinite Jump
+            RunService.Heartbeat:Connect(function()
+                if getgenv().DWSettings.InfiniteJump then
+                    local character = LocalPlayer.Character
+                    if character then
+                        local humanoid = character:FindFirstChildOfClass("Humanoid")
+                        if humanoid and humanoid.FloorMaterial ~= Enum.Material.Air then
+                            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                        end
+                    end
+                end
+            end)
+
+            -- Simple GUI
+            local ScreenGui = Instance.new("ScreenGui")
+            ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+            local MainFrame = Instance.new("Frame")
+            MainFrame.Size = UDim2.new(0, 200, 0, 150)
+            MainFrame.Position = UDim2.new(0.7, 0, 0.1, 0)
+            MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+            MainFrame.Active = true
+            MainFrame.Draggable = true
+            MainFrame.Parent = ScreenGui
+
+            local Title = Instance.new("TextLabel")
+            Title.Size = UDim2.new(1, 0, 0, 30)
+            Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+            Title.Text = "Dandy's World"
+            Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Title.Font = Enum.Font.SourceSansBold
+            Title.TextSize = 14
+            Title.Parent = MainFrame
+
+            local speedBtn = Instance.new("TextButton")
+            speedBtn.Size = UDim2.new(0.9, 0, 0, 25)
+            speedBtn.Position = UDim2.new(0.05, 0, 0.25, 0)
+            speedBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            speedBtn.Text = "Speed: 50"
+            speedBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            speedBtn.Font = Enum.Font.SourceSans
+            speedBtn.TextSize = 12
+            speedBtn.Parent = MainFrame
+
+            speedBtn.MouseButton1Click:Connect(function()
+                getgenv().DWSettings.Speed = getgenv().DWSettings.Speed + 10
+                if getgenv().DWSettings.Speed > 200 then getgenv().DWSettings.Speed = 10 end
+                speedBtn.Text = "Speed: " .. getgenv().DWSettings.Speed
+                setSpeed(getgenv().DWSettings.Speed)
+            end)
+
+            local noclipBtn = Instance.new("TextButton")
+            noclipBtn.Size = UDim2.new(0.9, 0, 0, 25)
+            noclipBtn.Position = UDim2.new(0.05, 0, 0.45, 0)
+            noclipBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            noclipBtn.Text = "Noclip: OFF"
+            noclipBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            noclipBtn.Font = Enum.Font.SourceSans
+            noclipBtn.TextSize = 12
+            noclipBtn.Parent = MainFrame
+
+            noclipBtn.MouseButton1Click:Connect(function()
+                getgenv().DWSettings.Noclip = not getgenv().DWSettings.Noclip
+                noclipBtn.Text = "Noclip: " .. (getgenv().DWSettings.Noclip and "ON" or "OFF")
+            end)
+
+            local jumpBtn = Instance.new("TextButton")
+            jumpBtn.Size = UDim2.new(0.9, 0, 0, 25)
+            jumpBtn.Position = UDim2.new(0.05, 0, 0.65, 0)
+            jumpBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            jumpBtn.Text = "Infinite Jump: OFF"
+            jumpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            jumpBtn.Font = Enum.Font.SourceSans
+            jumpBtn.TextSize = 12
+            jumpBtn.Parent = MainFrame
+
+            jumpBtn.MouseButton1Click:Connect(function()
+                getgenv().DWSettings.InfiniteJump = not getgenv().DWSettings.InfiniteJump
+                jumpBtn.Text = "Infinite Jump: " .. (getgenv().DWSettings.InfiniteJump and "ON" or "OFF")
+            end)
+
+            print("Dandy's World Script Loaded!")
+        ]]
+    },
+    
+    ["Blox Fruits"] = {
+        id = 2753915549,
+        script = [[
+            -- Blox Fruits Script (Basic)
+            local Players = game:GetService("Players")
+            local LocalPlayer = Players.LocalPlayer
+
+            -- Speed
+            LocalPlayer.Character.Humanoid.WalkSpeed = 100
+
+            -- Infinite Jump
+            game:GetService("UserInputService").JumpRequest:Connect(function()
+                LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            end)
+
+            print("Blox Fruits Script Loaded!")
+        ]]
+    },
+    
+    ["Tower of Hell"] = {
+        id = 4623386862,
+        script = [[
+            -- Tower of Hell Script
+            local Players = game:GetService("Players")
+            local LocalPlayer = Players.LocalPlayer
+
+            -- Speed
+            LocalPlayer.Character.Humanoid.WalkSpeed = 200
+
+            -- Noclip
+            game:GetService("RunService").Stepped:Connect(function()
+                for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end)
+
+            print("Tower of Hell Script Loaded!")
+        ]]
+    },
+    
+    ["Arsenal"] = {
+        id = 286090429,
+        script = [[
+            -- Arsenal Script (Aimbot Basic)
+            local Players = game:GetService("Players")
+            local RunService = game:GetService("RunService")
+            local LocalPlayer = Players.LocalPlayer
+            local Camera = workspace.CurrentCamera
+
+            RunService.RenderStepped:Connect(function()
+                local closest = nil
+                local closestDist = math.huge
+                
+                for _, player in ipairs(Players:GetPlayers()) do
+                    if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+                        local screenPos, onScreen = Camera:WorldToScreenPoint(player.Character.Head.Position)
+                        if onScreen then
+                            local dist = (Vector2.new(screenPos.X, screenPos.Y) - Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)).Magnitude
+                            if dist < closestDist then
+                                closestDist = dist
+                                closest = player
+                            end
+                        end
+                    end
+                end
+                
+                if closest then
+                    -- Simple aim assist
+                end
+            end)
+
+            print("Arsenal Script Loaded!")
+        ]]
+    },
+    
+    ["Brookhaven"] = {
+        id = 4924922222,
+        script = [[
+            -- Brookhaven Script
+            local Players = game:GetService("Players")
+            local LocalPlayer = Players.LocalPlayer
+
+            -- Speed
+            LocalPlayer.Character.Humanoid.WalkSpeed = 100
+
+            -- Fly
+            local flying = false
+            local UserInputService = game:GetService("UserInputService")
+
+            UserInputService.InputBegan:Connect(function(input)
+                if input.KeyCode == Enum.KeyCode.F then
+                    flying = not flying
+                    if flying then
+                        local bv = Instance.new("BodyVelocity")
+                        bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                        bv.Parent = LocalPlayer.Character.HumanoidRootPart
+                    else
+                        local bv = LocalPlayer.Character.HumanoidRootPart:FindFirstChildOfClass("BodyVelocity")
+                        if bv then bv:Destroy() end
+                    end
+                end
+            end)
+
+            print("Brookhaven Script Loaded!")
+        ]]
+    },
+    
+    ["Piggy"] = {
+        id = 4623386862,
+        script = [[
+            -- Piggy Script
+            local Players = game:GetService("Players")
+            local LocalPlayer = Players.LocalPlayer
+
+            -- Speed
+            LocalPlayer.Character.Humanoid.WalkSpeed = 150
+
+            -- Noclip
+            game:GetService("RunService").Stepped:Connect(function()
+                for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end)
+
+            print("Piggy Script Loaded!")
+        ]]
+    },
+    
+    ["Murder Mystery 2"] = {
+        id = 142823291,
+        script = [[
+            -- MM2 Script
+            local Players = game:GetService("Players")
+            local LocalPlayer = Players.LocalPlayer
+
+            -- Speed
+            LocalPlayer.Character.Humanoid.WalkSpeed = 100
+
+            -- ESP
+            for _, player in ipairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer and player.Character then
+                    local esp = Instance.new("BillboardGui")
+                    esp.Size = UDim2.new(0, 100, 0, 30)
+                    esp.Adornee = player.Character:FindFirstChild("Head")
+                    esp.AlwaysOnTop = true
+                    esp.Parent = player.Character
+                    
+                    local label = Instance.new("TextLabel")
+                    label.Size = UDim2.new(1, 0, 1, 0)
+                    label.BackgroundTransparency = 1
+                    label.Text = player.Name
+                    label.TextColor3 = Color3.fromRGB(255, 0, 0)
+                    label.TextStrokeTransparency = 0
+                    label.Font = Enum.Font.SourceSansBold
+                    label.TextSize = 14
+                    label.Parent = esp
+                end
+            end
+
+            print("MM2 Script Loaded!")
+        ]]
+    }
+}
+
+-- Create Game Hub buttons
+local yPos = 0
+for gameName, gameData in pairs(gameHubScripts) do
+    local gameBtn = Instance.new("TextButton")
+    gameBtn.Size = UDim2.new(0.9, 0, 0, 35)
+    gameBtn.Position = UDim2.new(0.05, 0, 0, yPos)
+    gameBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    gameBtn.Text = gameName .. " Script"
+    gameBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    gameBtn.Font = Enum.Font.SourceSans
+    gameBtn.TextSize = 14
+    gameBtn.Parent = frames["GameHub"]
+    
+    gameBtn.MouseButton1Click:Connect(function()
+        if game.PlaceId == gameData.id then
+            -- Load script for current game
+            local success, err = pcall(function()
+                loadstring(gameData.script)()
+            end)
+            
+            local notification = Instance.new("TextLabel")
+            notification.Size = UDim2.new(0, 200, 0, 30)
+            notification.Position = UDim2.new(0.5, -100, 0.8, 0)
+            notification.BackgroundColor3 = success and Color3.fromRGB(0, 150, 0) or Color3.fromRGB(200, 0, 0)
+            notification.Text = success and (gameName .. " script loaded!") or ("Error: " .. tostring(err))
+            notification.TextColor3 = Color3.fromRGB(255, 255, 255)
+            notification.Font = Enum.Font.SourceSansBold
+            notification.TextSize = 14
+            notification.Parent = ScreenGui
+            
+            task.delay(2, function()
+                notification:Destroy()
+            end)
+        else
+            -- Teleport to game
+            local notification = Instance.new("TextLabel")
+            notification.Size = UDim2.new(0, 200, 0, 30)
+            notification.Position = UDim2.new(0.5, -100, 0.8, 0)
+            notification.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+            notification.Text = "Teleporting to " .. gameName .. "..."
+            notification.TextColor3 = Color3.fromRGB(255, 255, 255)
+            notification.Font = Enum.Font.SourceSansBold
+            notification.TextSize = 14
+            notification.Parent = ScreenGui
+            
+            task.delay(2, function()
+                notification:Destroy()
+            end)
+            
+            game:GetService("TeleportService"):Teleport(gameData.id)
+        end
+    end)
+    
+    yPos = yPos + 40
+end
+
+-- ============================================  
 -- UI ELEMENTS CREATION  
 -- ============================================
 
@@ -642,7 +993,6 @@ createSlider(frames["Movement"], "Fly Speed", 10, 200, settings.flySpeed, functi
     settings.flySpeed = value  
 end)
 
--- NOCLIP TOGGLE (NEW)
 createToggle(frames["Movement"], "Noclip", settings.noclipEnabled, function(value)  
     settings.noclipEnabled = value  
     if value then  
@@ -716,6 +1066,17 @@ end)
 
 -- Initial player list  
 refreshPlayerList()
+
+-- GAME HUB TAB  
+local hubTitle = Instance.new("TextLabel")
+hubTitle.Size = UDim2.new(0.9, 0, 0, 30)
+hubTitle.Position = UDim2.new(0.05, 0, 0, 0)
+hubTitle.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+hubTitle.Text = "Select a Game Script:"
+hubTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+hubTitle.Font = Enum.Font.SourceSansBold
+hubTitle.TextSize = 14
+hubTitle.Parent = frames["GameHub"]
 
 -- INFO TAB  
 local function createInfoLabel(parent, text)  
