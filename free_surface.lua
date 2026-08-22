@@ -1,6 +1,8 @@
 -- Services  
 local Players = game:GetService("Players")  
 local RunService = game:GetService("RunService")  
+local UserInputService = game:GetService("UserInputService")  
+local Lighting = game:GetService("Lighting")  
 local HttpService = game:GetService("HttpService")  
 local VirtualUser = game:GetService("VirtualUser")  
 local Camera = workspace.CurrentCamera or workspace:WaitForChild("Camera")  
@@ -21,6 +23,7 @@ local settings = {
 -- State  
 local flying = false  
 local espObjects = {}
+local guiVisible = true
 
 -- ============================================  
 -- FUNCTION DEFINITIONS  
@@ -32,59 +35,90 @@ ScreenGui.Name = "DeltaUltimateGUI"
 ScreenGui.ResetOnSpawn = false  
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
-local MainFrame = Instance.new("Frame")  
-MainFrame.Size = UDim2.new(0, 350, 0, 550)  
-MainFrame.Position = UDim2.new(0, 10, 0, 10)  
-MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)  
-MainFrame.Active = true  
-MainFrame.Draggable = true  
-MainFrame.Parent = ScreenGui
+-- Main container
+local MainContainer = Instance.new("Frame")
+MainContainer.Size = UDim2.new(0, 450, 0, 500)
+MainContainer.Position = UDim2.new(0.5, -225, 0.5, -250)
+MainContainer.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainContainer.Active = true
+MainContainer.Draggable = true
+MainContainer.Parent = ScreenGui
+
+-- Title bar
+local TitleBar = Instance.new("Frame")
+TitleBar.Size = UDim2.new(1, 0, 0, 30)
+TitleBar.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+TitleBar.Parent = MainContainer
 
 local Title = Instance.new("TextLabel")  
-Title.Size = UDim2.new(1, 0, 0, 30)  
-Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)  
+Title.Size = UDim2.new(1, -30, 1, 0)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.BackgroundTransparency = 1
 Title.Text = "Delta Ultimate v5.1"  
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)  
 Title.Font = Enum.Font.SourceSansBold  
 Title.TextSize = 20  
-Title.Parent = MainFrame
+Title.Parent = TitleBar
+
+-- Close button
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 30, 0, 30)
+CloseBtn.Position = UDim2.new(1, -30, 0, 0)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.Font = Enum.Font.SourceSansBold
+CloseBtn.TextSize = 16
+CloseBtn.Parent = TitleBar
+
+CloseBtn.MouseButton1Click:Connect(function()
+    MainContainer.Visible = not MainContainer.Visible
+    guiVisible = MainContainer.Visible
+end)
+
+-- Side tab bar (LEFT side)
+local SideTabBar = Instance.new("Frame")
+SideTabBar.Size = UDim2.new(0, 120, 1, -30)
+SideTabBar.Position = UDim2.new(0, 0, 0, 30)
+SideTabBar.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+SideTabBar.Parent = MainContainer
+
+-- Content area (RIGHT side)
+local ContentArea = Instance.new("Frame")
+ContentArea.Size = UDim2.new(0, 330, 1, -30)
+ContentArea.Position = UDim2.new(0, 120, 0, 30)
+ContentArea.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+ContentArea.Parent = MainContainer
 
 -- Create tabs  
-local TabBar = Instance.new("Frame")  
-TabBar.Size = UDim2.new(1, 0, 0, 35)  
-TabBar.Position = UDim2.new(0, 0, 0, 30)  
-TabBar.BackgroundColor3 = Color3.fromRGB(35, 35, 35)  
-TabBar.Parent = MainFrame
-
-local tabButtons = {}  
 local tabNames = {"Main", "Movement", "Visual", "Utility", "Teleport", "GameHub", "Info"}  
 local frames = {}
+local tabButtons = {}
 
--- Create frames first  
+-- Create frames in content area
 for _, name in ipairs(tabNames) do  
     local frame = Instance.new("ScrollingFrame")  
-    frame.Size = UDim2.new(1, 0, 1, -65)  
-    frame.Position = UDim2.new(0, 0, 0, 65)  
+    frame.Size = UDim2.new(1, 0, 1, 0)  
     frame.BackgroundTransparency = 1  
     frame.ScrollBarThickness = 5  
     frame.CanvasSize = UDim2.new(0, 0, 0, 0)  
     frame.AutomaticCanvasSize = Enum.AutomaticSize.Y  
     frame.Visible = (name == "Main")  
-    frame.Parent = MainFrame  
+    frame.Parent = ContentArea  
     frames[name] = frame  
 end
 
--- Create tab buttons  
+-- Create side tab buttons
 for i, name in ipairs(tabNames) do  
     local btn = Instance.new("TextButton")  
-    btn.Size = UDim2.new(0.1428, 0, 1, 0)  
-    btn.Position = UDim2.new((i - 1) * 0.1428, 0, 0, 0)  
+    btn.Size = UDim2.new(1, -10, 0, 35)  
+    btn.Position = UDim2.new(0, 5, 0, 5 + (i - 1) * 40)  
     btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)  
     btn.Text = name  
     btn.TextColor3 = Color3.fromRGB(255, 255, 255)  
     btn.Font = Enum.Font.SourceSans  
-    btn.TextSize = 10  
-    btn.Parent = TabBar  
+    btn.TextSize = 13  
+    btn.Parent = SideTabBar  
     tabButtons[name] = btn  
 end
 
@@ -95,6 +129,7 @@ local function switchTab(tabName)
     end  
     for name, btn in pairs(tabButtons) do  
         btn.BackgroundColor3 = (name == tabName) and Color3.fromRGB(70, 70, 70) or Color3.fromRGB(50, 50, 50)  
+        btn.TextColor3 = (name == tabName) and Color3.fromRGB(255, 255, 0) or Color3.fromRGB(255, 255, 255)
     end  
 end
 
@@ -103,6 +138,16 @@ for name, btn in pairs(tabButtons) do
         switchTab(name)  
     end)  
 end
+
+-- Keybind to toggle GUI (RightShift by default)
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    
+    if input.KeyCode == Enum.KeyCode.RightShift then
+        MainContainer.Visible = not MainContainer.Visible
+        guiVisible = MainContainer.Visible
+    end
+end)
 
 -- Helper functions  
 local function createButton(parent, text, callback)  
@@ -607,47 +652,283 @@ local gameHubScripts = {
     ["Dandy's World"] = {
         id = 18378383072,
         script = [[
-           loadstring(game:HttpGet("https://raw.githubusercontent.com/Glitchederror0724/Surface/refs/heads/main/games/dandysworld"))()
+            -- Dandy's World Script
+            local Players = game:GetService("Players")
+            local RunService = game:GetService("RunService")
+            local LocalPlayer = Players.LocalPlayer
+
+            getgenv().DWSettings = {
+                Speed = 50,
+                Noclip = false,
+                InfiniteJump = false
+            }
+
+            local function setSpeed(speed)
+                local character = LocalPlayer.Character
+                if character then
+                    local humanoid = character:FindFirstChildOfClass("Humanoid")
+                    if humanoid then
+                        humanoid.WalkSpeed = speed
+                    end
+                end
+            end
+
+            RunService.Stepped:Connect(function()
+                if getgenv().DWSettings.Noclip then
+                    local character = LocalPlayer.Character
+                    if character then
+                        for _, part in ipairs(character:GetDescendants()) do
+                            if part:IsA("BasePart") then
+                                part.CanCollide = false
+                            end
+                        end
+                    end
+                end
+            end)
+
+            RunService.Heartbeat:Connect(function()
+                if getgenv().DWSettings.InfiniteJump then
+                    local character = LocalPlayer.Character
+                    if character then
+                        local humanoid = character:FindFirstChildOfClass("Humanoid")
+                        if humanoid and humanoid.FloorMaterial ~= Enum.Material.Air then
+                            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                        end
+                    end
+                end
+            end)
+
+            local ScreenGui = Instance.new("ScreenGui")
+            ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+            local MainFrame = Instance.new("Frame")
+            MainFrame.Size = UDim2.new(0, 200, 0, 150)
+            MainFrame.Position = UDim2.new(0.7, 0, 0.1, 0)
+            MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+            MainFrame.Active = true
+            MainFrame.Draggable = true
+            MainFrame.Parent = ScreenGui
+
+            local Title = Instance.new("TextLabel")
+            Title.Size = UDim2.new(1, 0, 0, 30)
+            Title.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+            Title.Text = "Dandy's World"
+            Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Title.Font = Enum.Font.SourceSansBold
+            Title.TextSize = 14
+            Title.Parent = MainFrame
+
+            local speedBtn = Instance.new("TextButton")
+            speedBtn.Size = UDim2.new(0.9, 0, 0, 25)
+            speedBtn.Position = UDim2.new(0.05, 0, 0.25, 0)
+            speedBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            speedBtn.Text = "Speed: 50"
+            speedBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            speedBtn.Font = Enum.Font.SourceSans
+            speedBtn.TextSize = 12
+            speedBtn.Parent = MainFrame
+
+            speedBtn.MouseButton1Click:Connect(function()
+                getgenv().DWSettings.Speed = getgenv().DWSettings.Speed + 10
+                if getgenv().DWSettings.Speed > 200 then getgenv().DWSettings.Speed = 10 end
+                speedBtn.Text = "Speed: " .. getgenv().DWSettings.Speed
+                setSpeed(getgenv().DWSettings.Speed)
+            end)
+
+            local noclipBtn = Instance.new("TextButton")
+            noclipBtn.Size = UDim2.new(0.9, 0, 0, 25)
+            noclipBtn.Position = UDim2.new(0.05, 0, 0.45, 0)
+            noclipBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            noclipBtn.Text = "Noclip: OFF"
+            noclipBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            noclipBtn.Font = Enum.Font.SourceSans
+            noclipBtn.TextSize = 12
+            noclipBtn.Parent = MainFrame
+
+            noclipBtn.MouseButton1Click:Connect(function()
+                getgenv().DWSettings.Noclip = not getgenv().DWSettings.Noclip
+                noclipBtn.Text = "Noclip: " .. (getgenv().DWSettings.Noclip and "ON" or "OFF")
+            end)
+
+            local jumpBtn = Instance.new("TextButton")
+            jumpBtn.Size = UDim2.new(0.9, 0, 0, 25)
+            jumpBtn.Position = UDim2.new(0.05, 0, 0.65, 0)
+            jumpBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+            jumpBtn.Text = "Infinite Jump: OFF"
+            jumpBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+            jumpBtn.Font = Enum.Font.SourceSans
+            jumpBtn.TextSize = 12
+            jumpBtn.Parent = MainFrame
+
+            jumpBtn.MouseButton1Click:Connect(function()
+                getgenv().DWSettings.InfiniteJump = not getgenv().DWSettings.InfiniteJump
+                jumpBtn.Text = "Infinite Jump: " .. (getgenv().DWSettings.InfiniteJump and "ON" or "OFF")
+            end)
+
+            print("Dandy's World Script Loaded!")
         ]]
     },
     
-    ["Animals Hospital"] = {
-        id = 78515283254292,
+    ["Blox Fruits"] = {
+        id = 2753915549,
         script = [[
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/Glitchederror0724/Surface/refs/heads/main/games/animal_hospital"))()
+            -- Blox Fruits Script (Basic)
+            local Players = game:GetService("Players")
+            local LocalPlayer = Players.LocalPlayer
+
+            LocalPlayer.Character.Humanoid.WalkSpeed = 100
+
+            game:GetService("UserInputService").JumpRequest:Connect(function()
+                LocalPlayer.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+            end)
+
+            print("Blox Fruits Script Loaded!")
         ]]
     },
     
-    ["Demonogly"] = {
+    ["Tower of Hell"] = {
+        id = 4623386862,
         script = [[
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/Glitchederror0724/Surface/refs/heads/main/games/demonology"))()
+            -- Tower of Hell Script
+            local Players = game:GetService("Players")
+            local LocalPlayer = Players.LocalPlayer
+
+            LocalPlayer.Character.Humanoid.WalkSpeed = 200
+
+            game:GetService("RunService").Stepped:Connect(function()
+                for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end)
+
+            print("Tower of Hell Script Loaded!")
         ]]
     },
     
-    ["Jailbreak"] = {
-        id = 606849621,
+    ["Arsenal"] = {
+        id = 286090429,
         script = [[
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/Glitchederror0724/Surface/refs/heads/main/games/jailbreak"))()
+            -- Arsenal Script (Aimbot Basic)
+            local Players = game:GetService("Players")
+            local RunService = game:GetService("RunService")
+            local LocalPlayer = Players.LocalPlayer
+            local Camera = workspace.CurrentCamera
+
+            RunService.RenderStepped:Connect(function()
+                local closest = nil
+                local closestDist = math.huge
+                
+                for _, player in ipairs(Players:GetPlayers()) do
+                    if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+                        local screenPos, onScreen = Camera:WorldToScreenPoint(player.Character.Head.Position)
+                        if onScreen then
+                            local dist = (Vector2.new(screenPos.X, screenPos.Y) - Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)).Magnitude
+                            if dist < closestDist then
+                                closestDist = dist
+                                closest = player
+                            end
+                        end
+                    end
+                end
+                
+                if closest then
+                    -- Simple aim assist
+                end
+            end)
+
+            print("Arsenal Script Loaded!")
+        ]]
+    },
+    
+    ["Brookhaven"] = {
+        id = 4924922222,
+        script = [[
+            -- Brookhaven Script
+            local Players = game:GetService("Players")
+            local LocalPlayer = Players.LocalPlayer
+
+            LocalPlayer.Character.Humanoid.WalkSpeed = 100
+
+            local flying = false
+            local UserInputService = game:GetService("UserInputService")
+
+            UserInputService.InputBegan:Connect(function(input)
+                if input.KeyCode == Enum.KeyCode.F then
+                    flying = not flying
+                    if flying then
+                        local bv = Instance.new("BodyVelocity")
+                        bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+                        bv.Parent = LocalPlayer.Character.HumanoidRootPart
+                    else
+                        local bv = LocalPlayer.Character.HumanoidRootPart:FindFirstChildOfClass("BodyVelocity")
+                        if bv then bv:Destroy() end
+                    end
+                end
+            end)
+
+            print("Brookhaven Script Loaded!")
         ]]
     },
     
     ["Piggy"] = {
         id = 4623386862,
         script = [[
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/Glitchederror0724/Surface/refs/heads/main/games/Piggy"))()
+            -- Piggy Script
+            local Players = game:GetService("Players")
+            local LocalPlayer = Players.LocalPlayer
+
+            LocalPlayer.Character.Humanoid.WalkSpeed = 150
+
+            game:GetService("RunService").Stepped:Connect(function()
+                for _, part in ipairs(LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end)
+
+            print("Piggy Script Loaded!")
         ]]
     },
     
     ["Murder Mystery 2"] = {
         id = 142823291,
         script = [[
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/Glitchederror0724/Surface/refs/heads/main/games/mm2"))()
+            -- MM2 Script
+            local Players = game:GetService("Players")
+            local LocalPlayer = Players.LocalPlayer
+
+            LocalPlayer.Character.Humanoid.WalkSpeed = 100
+
+            for _, player in ipairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer and player.Character then
+                    local esp = Instance.new("BillboardGui")
+                    esp.Size = UDim2.new(0, 100, 0, 30)
+                    esp.Adornee = player.Character:FindFirstChild("Head")
+                    esp.AlwaysOnTop = true
+                    esp.Parent = player.Character
+                    
+                    local label = Instance.new("TextLabel")
+                    label.Size = UDim2.new(1, 0, 1, 0)
+                    label.BackgroundTransparency = 1
+                    label.Text = player.Name
+                    label.TextColor3 = Color3.fromRGB(255, 0, 0)
+                    label.TextStrokeTransparency = 0
+                    label.Font = Enum.Font.SourceSansBold
+                    label.TextSize = 14
+                    label.Parent = esp
+                end
+            end
+
+            print("MM2 Script Loaded!")
         ]]
     }
 }
 
 -- Create Game Hub buttons
-local yPos = 0
+local yPos = 35
 for gameName, gameData in pairs(gameHubScripts) do
     local gameBtn = Instance.new("TextButton")
     gameBtn.Size = UDim2.new(0.9, 0, 0, 35)
@@ -661,7 +942,6 @@ for gameName, gameData in pairs(gameHubScripts) do
     
     gameBtn.MouseButton1Click:Connect(function()
         if game.PlaceId == gameData.id then
-            -- Load script for current game
             local success, err = pcall(function()
                 loadstring(gameData.script)()
             end)
@@ -680,7 +960,24 @@ for gameName, gameData in pairs(gameHubScripts) do
                 notification:Destroy()
             end)
         else
-          
+            local notification = Instance.new("TextLabel")
+            notification.Size = UDim2.new(0, 200, 0, 30)
+            notification.Position = UDim2.new(0.5, -100, 0.8, 0)
+            notification.BackgroundColor3 = Color3.fromRGB(255, 165, 0)
+            notification.Text = "Teleporting to " .. gameName .. "..."
+            notification.TextColor3 = Color3.fromRGB(255, 255, 255)
+            notification.Font = Enum.Font.SourceSansBold
+            notification.TextSize = 14
+            notification.Parent = ScreenGui
+            
+            task.delay(2, function()
+                notification:Destroy()
+            end)
+            
+            game:GetService("TeleportService"):Teleport(gameData.id)
+        end
+    end)
+    
     yPos = yPos + 40
 end
 
@@ -845,3 +1142,4 @@ createInfoLabel(frames["Info"], "Status: Loaded Successfully")
 
 print("Delta Ultimate v5.1 loaded successfully!")  
 print("Welcome, " .. userName .. "!")
+print("Press RightShift to toggle GUI")
